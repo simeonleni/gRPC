@@ -62,22 +62,28 @@ Here is the database schema for the library system:
 
 ### Books Table
 
-- ISBN (VARCHAR(13), PK)
-- Title (VARCHAR(255))
-- Author (VARCHAR(255))
-- Location (VARCHAR(255))
-- Status (ENUM('Available', 'CheckedOut') DEFAULT 'Available')
+| Column   | Type                            | Constraints         |
+| -------- | ------------------------------- | ------------------- |
+| ISBN     | VARCHAR(13)                     | Primary Key (PK)    |
+| Title    | VARCHAR(255)                    |                     |
+| Author   | VARCHAR(255)                    |                     |
+| Location | VARCHAR(255)                    |                     |
+| Status   | ENUM('Available', 'CheckedOut') | Default 'Available' |
 
 ### Users Table
 
-- UserID (INT AUTO_INCREMENT, PK)
-- Name (VARCHAR(255))
-- UserType (ENUM('Student', 'Librarian'))
-- Contact (VARCHAR(255))
-- Status (ENUM('Available', 'CheckedOut') DEFAULT 'Available')
+| Column   | Type                            | Constraints         |
+| -------- | ------------------------------- | ------------------- |
+| UserID   | INT AUTO_INCREMENT              | Primary Key (PK)    |
+| Name     | VARCHAR(255)                    |                     |
+| UserType | ENUM('Student', 'Librarian')    |                     |
+| Contact  | VARCHAR(255)                    |                     |
+| Status   | ENUM('Available', 'CheckedOut') | Default 'Available' |
 
 ### Borrowed Books Table
 
-- BorrowID (INT AUTO_INCREMENT, PK)
-- UserID (INT, FK)
-- ISBN (VARCHAR(13), FK)
+| Column   | Type               | Constraints      |
+| -------- | ------------------ | ---------------- |
+| BorrowID | INT AUTO_INCREMENT | Primary Key (PK) |
+| UserID   | INT                | Foreign Key (FK) |
+| ISBN     | VARCHAR(13)        | Foreign Key (FK) |
