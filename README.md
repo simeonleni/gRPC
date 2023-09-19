@@ -8,59 +8,31 @@ gRPC is a powerful tool for building distributed systems, microservices, and API
 
 In this project, we are designing and implementing a library system using gRPC. The system caters to two types of users: students and librarians, and it provides essential functionalities for managing books, borrowing them, and returning them.
 
-### Add Book
+### Features
 
-Librarians can create a book with specific details and receive the ISBN for the added book.
+- **Add Book:** Librarians can create a book with specific details and receive the ISBN for the added book.
 
-### Create Users
+- **Create Users:** This operation allows the creation of multiple users, each with a specific profile. Users are streamed to the server, making data management efficient.
 
-This operation allows the creation of multiple users, each with a specific profile. Users are streamed to the server, and the response is sent once the operation completes. This means you can send multiple user profiles to the server in a continuous stream, making data management efficient.
+- **Server:** On the server side, code receives and processes incoming users as they arrive in the stream.
 
-### Server
+- **Asynchronous:** The operation is asynchronous, responding as soon as it completes its part for each user.
 
-On the server side, there's code to receive and process incoming users as they arrive in the stream. The server will take each user profile from the stream and perform actions, such as creating user accounts or storing their information in a database.
+- **Update Book:** Librarians can edit the details of a given book.
 
-### Asynchronous
+- **Remove Book:** Librarians can remove a book from the library's collection and return the updated list of books.
 
-Importantly, the operation is asynchronous. It doesn't wait for all users to be sent and processed before responding. Instead, it starts responding as soon as it completes its part of the operation for each user.
+- **List Available Books:** Students can get a list of all available books.
 
-### Update Book
+- **Locate Book:** Students can search for a book based on its ISBN and receive its location if available or be informed if the book is not available.
 
-Librarians can edit the details of a given book.
+- **Borrow Book:** Students can borrow a book by providing their user ID and the book's ISBN.
 
-### Remove Book
-
-Librarians can remove a book from the library's collection and return the updated list of books.
-
-### List Available Books
-
-Students can get a list of all available books.
-
-### Locate Book
-
-Students can search for a book based on its ISBN and receive its location if available or be informed if the book is not available.
-
-#### ISBN Query
-
-You have the ISBN (International Standard Book Number) of the book you're looking for.
-
-#### Asking the Library System
-
-You go to a computer or use a library app and enter the ISBN of the book you want.
-
-#### Library System Response
-
-The library server checks its records to see if the book with that ISBN is available in the library. If available, it provides the book's location; otherwise, it informs you that the book is not currently in the library.
-
-### Borrow Book
-
-Students can borrow a book by providing their user ID and the book's ISBN.
-
-## Database Schema
+### Database Schema
 
 Here is the database schema for the library system:
 
-### Books Table
+#### Books Table
 
 | Column   | Type                            | Constraints         |
 | -------- | ------------------------------- | ------------------- |
@@ -70,7 +42,7 @@ Here is the database schema for the library system:
 | Location | VARCHAR(255)                    |                     |
 | Status   | ENUM('Available', 'CheckedOut') | Default 'Available' |
 
-### Users Table
+#### Users Table
 
 | Column   | Type                            | Constraints         |
 | -------- | ------------------------------- | ------------------- |
@@ -80,7 +52,7 @@ Here is the database schema for the library system:
 | Contact  | VARCHAR(255)                    |                     |
 | Status   | ENUM('Available', 'CheckedOut') | Default 'Available' |
 
-### Borrowed Books Table
+#### Borrowed Books Table
 
 | Column   | Type               | Constraints      |
 | -------- | ------------------ | ---------------- |
