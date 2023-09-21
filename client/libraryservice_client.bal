@@ -19,7 +19,7 @@ public function main() returns error? {
     ListAvailableBooksResponse listAvailableBooksResponse = check ep->ListAvailableBooks(listAvailableBooksRequest);
     io:println(listAvailableBooksResponse);
 
-    LocateBookRequest locateBookRequest = {isbn: "ballerina"};
+    LocateBookRequest locateBookRequest = {isbn: "9780061120084"};
     LocateBookResponse locateBookResponse = check ep->LocateBook(locateBookRequest);
     io:println(locateBookResponse);
 

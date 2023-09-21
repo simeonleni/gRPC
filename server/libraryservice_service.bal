@@ -1,6 +1,7 @@
 import ballerina/grpc;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerina/sql;
 import ballerina/io;
 
 // import ballerina/sql;
@@ -80,26 +81,56 @@ service "LibraryService" on ep {
 
     }
     remote function ListAvailableBooks(ListAvailableBooksRequest value) returns ListAvailableBooksResponse|error {
-
+        ListAvailableBooksResponse response = {};
         // stream<Book, sql:Error?> bookStream = libraryClient->query(`SELECT * FROM Books`);
-        // return from Book books in bookStream
-        //     select books;
+        // check from Book books in bookStream
+        //     do {
+        //         response = {
+        //             availableBooks: 
+        //         };
+        //     };
 
-        // _ = check libraryClient->execute(`SELECT * FROM Books`);
+        // var data = check libraryClient->execute(`SELECT * FROM Books`);
 
-        ListAvailableBooksResponse response = {
-            availableBooks: []
+        // ListAvailableBooksResponse response = {
+        //     availableBooks: []
+        // };
+
+        Book data = check libraryClient->queryRow(`SELECT * FROM Books`);
+
+        response = {
+            availableBooks: [data]
         };
+
         return response;
     }
 
     remote function LocateBook(LocateBookRequest value) returns LocateBookResponse|error {
-        var data = check libraryClient->execute(`SELECT Location, Status FROM Books`);
-        LocateBookResponse response = {
-            location: data.toJson().toBalString()
-        };
+        LocateBookResponse response = {};
+        // while true {
+        //     var data = check libraryClient->execute(`SELECT Location, Status FROM Books WHERE ISBN = ${value.isbn}`);
+
+        //     response = {
+        //         location: ,
+        //         available:
+        //     };
+
+        stream<Book, sql:Error?> bookStream = libraryClient->query(`SELECT Location, Status FROM Books WHERE ISBN = ${value.isbn}`);
+        check from Book book in bookStream
+            do {
+                if (book.status == "Available") {
+                    response = {
+                        location: book.location,
+                        available: true
+                    };
+                }
+                response = {
+                    location: book.location,
+                    available: false
+                };
+            };
         return response;
-    }
+    };
 
     remote function BorrowBook(BorrowBookRequest value) returns BorrowBookResponse|error {
         _ = check libraryClient->execute(`INSERT INTO Borrowed_Books (UserID, ISBN)
