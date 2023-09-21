@@ -3,15 +3,15 @@ import ballerina/io;
 LibraryServiceClient ep = check new ("http://localhost:9090");
 
 public function main() returns error? {
-    AddBookRequest addBookRequest = {book: {isbn: "ballerina", title: "ballerina", author: "ballerina", location: "ballerina", status: "Available"}};
+    AddBookRequest addBookRequest = {book: {isbn: "9780451524956", title: "ballerina", author: "ballerina", location: "Section A", status: "Available"}};
     AddBookResponse addBookResponse = check ep->AddBook(addBookRequest);
     io:println(addBookResponse);
 
-    UpdateBookRequest updateBookRequest = {isbn: "ballerina", book: {isbn: "ballerina", title: "ballerina", author: "ballerina", location: "ballerina", status: "Available"}};
+    UpdateBookRequest updateBookRequest = {isbn: "9780451524956", book: {isbn: "ballerina", title: "ballerina", author: "ballerina", location: "ballerina", status: "Available"}};
     UpdateBookResponse updateBookResponse = check ep->UpdateBook(updateBookRequest);
     io:println(updateBookResponse);
 
-    RemoveBookRequest removeBookRequest = {isbn: "ballerina"};
+    RemoveBookRequest removeBookRequest = {isbn: "9780451524956"};
     RemoveBookResponse removeBookResponse = check ep->RemoveBook(removeBookRequest);
     io:println(removeBookResponse);
 
@@ -23,7 +23,7 @@ public function main() returns error? {
     LocateBookResponse locateBookResponse = check ep->LocateBook(locateBookRequest);
     io:println(locateBookResponse);
 
-    BorrowBookRequest borrowBookRequest = {userId: 1, isbn: "ballerina"};
+    BorrowBookRequest borrowBookRequest = {userId: 0, isbn: "9781400032716"};
     BorrowBookResponse borrowBookResponse = check ep->BorrowBook(borrowBookRequest);
     io:println(borrowBookResponse);
 

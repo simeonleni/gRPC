@@ -1,7 +1,18 @@
 import ballerina/grpc;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
+import ballerina/sql;
 import ballerina/io;
+
+// import ballerina/sql;
+
+type Books record {
+    string isbn;
+    string title;
+    string author;
+    string location;
+    string status;
+};
 
 final mysql:Client libraryClient = check new (
     host = "first-instance.cg4vktva35w7.eu-north-1.rds.amazonaws.com",
@@ -62,23 +73,38 @@ service "LibraryService" on ep {
         {
             return error(e.message());
         }
+        RemoveBookResponse response = {
+            updatedBooks: []
+        };
 
-        return {};
+        return response;
 
     }
     remote function ListAvailableBooks(ListAvailableBooksRequest value) returns ListAvailableBooksResponse|error {
-        _ = check libraryClient->execute(`SELECT * FROM Books`);
-        return {};
+
+        // stream<Book, sql:Error?> bookStream = libraryClient->query(`SELECT * FROM Books`);
+        // return from Book books in bookStream
+        //     select books;
+
+        // _ = check libraryClient->execute(`SELECT * FROM Books`);
+
+        ListAvailableBooksResponse response = {
+            availableBooks: []
+        };
+        return response;
     }
 
-    remote function LocateBook(LocateBookRequest value) returns LocateBookResponse|error {
-        _ = check libraryClient->execute(`SELECT * FROM Books WHERE Status = 'available'`);
-        return {};
+    remote function LocateBook(LocateBookRequest value) returns Book[]|error {
+        stream<Book, sql:Error?> locate = libraryClient->query(`SELECT ISBN, Title, Location, Status FROM Books`);
+        return from Book book in locate
+            select book;
+        // _ = check libraryClient->execute(`SELECT ISBN, Title, Location, Status FROM Books`);
+        // return {};
     }
 
     remote function BorrowBook(BorrowBookRequest value) returns BorrowBookResponse|error {
         _ = check libraryClient->execute(`INSERT INTO Borrowed_Books (UserID, ISBN)
-                                            VALUES (${value.userId}, ${value.isbn}`);
+                                            VALUES (${value.userId}, ${value.isbn})`);
         return {};
     }
 
