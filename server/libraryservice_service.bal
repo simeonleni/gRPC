@@ -1,7 +1,6 @@
 import ballerina/grpc;
 import ballerinax/mysql;
 import ballerinax/mysql.driver as _;
-import ballerina/sql;
 import ballerina/io;
 
 // import ballerina/sql;
@@ -94,35 +93,42 @@ service "LibraryService" on ep {
         return response;
     }
 
-    remote function LocateBook(LocateBookRequest value) returns Book[]|error {
-        stream<Book, sql:Error?> locate = libraryClient->query(`SELECT ISBN, Title, Location, Status FROM Books`);
-        return from Book book in locate
-            select book;
-        // _ = check libraryClient->execute(`SELECT ISBN, Title, Location, Status FROM Books`);
-        // return {};
+    remote function LocateBook(LocateBookRequest value) returns LocateBookResponse|error {
+        var data = check libraryClient->execute(`SELECT Location, Status FROM Books`);
+        LocateBookResponse response = {
+            location: data.toJson().toBalString()
+        };
+        return response;
     }
 
     remote function BorrowBook(BorrowBookRequest value) returns BorrowBookResponse|error {
         _ = check libraryClient->execute(`INSERT INTO Borrowed_Books (UserID, ISBN)
                                             VALUES (${value.userId}, ${value.isbn})`);
-        return {};
+        BorrowBookResponse response = {
+            borrowedBook: value
+        };
+        return response;
     }
 
     remote function CreateUsers(stream<CreateUsersRequest, grpc:Error?> clientStream) returns CreateUsersResponse|error {
         CreateUsersRequest[] data = [];
+        CreateUsersResponse response = {};
         check clientStream.forEach(function(CreateUsersRequest value) {
             data.push(value);
             foreach CreateUsersRequest item in data {
                 foreach var d in item.users {
                     var result = libraryClient->execute(`INSERT INTO Users (UserID, Name, UserType, Contact) VALUES (${d.userId}, ${d.name}, ${d.userType}, ${d.contact})`);
                     if (result is error) {
-                        // Handle the error as needed.
-                        io:println("Error inserting user: ", result);
+                        io:println("Error inserting user");
                     }
                 }
             }
+            response = {
+                users: value
+            };
         });
-        return {users: {}};
+        return response;
+
     }
 }
 

@@ -27,7 +27,7 @@ public function main() returns error? {
     BorrowBookResponse borrowBookResponse = check ep->BorrowBook(borrowBookRequest);
     io:println(borrowBookResponse);
 
-    CreateUsersRequest createUsersRequest = {users: [{userId: 1, name: "ballerina", userType: "Student", contact: "ballerina"}]};
+    CreateUsersRequest createUsersRequest = {users: [{userId: 1, name: "ballerina", userType: "Student", contact: "ballerina"}, {userId: 22, name: "ballerina", userType: "Student", contact: "ballerina"}, {userId: 23, name: "ballerina", userType: "Student", contact: "ballerina"}]};
     CreateUsersStreamingClient createUsersStreamingClient = check ep->CreateUsers();
     check createUsersStreamingClient->sendCreateUsersRequest(createUsersRequest);
     check createUsersStreamingClient->complete();
