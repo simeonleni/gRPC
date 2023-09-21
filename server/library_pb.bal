@@ -584,7 +584,7 @@ public type LocateBookRequest record {|
 @protobuf:Descriptor {value: LIBRARY_DESC}
 public type LocateBookResponse record {|
     string location = "";
-    boolean available = false;
+    boolean available = true;
 |};
 
 @protobuf:Descriptor {value: LIBRARY_DESC}

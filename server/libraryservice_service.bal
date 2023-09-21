@@ -65,30 +65,34 @@ service "LibraryService" on ep {
     }
 
     remote function RemoveBook(RemoveBookRequest value) returns RemoveBookResponse|error {
-        do {
 
-            _ = check libraryClient->execute(`DELETE FROM Books WHERE ISBN = ${value.isbn}`);
-        }
-        on fail var e
-        {
-            return error(e.message());
-        }
-        RemoveBookResponse response = {
-            updatedBooks: []
-        };
+        _ = check libraryClient->execute(`DELETE FROM Books WHERE ISBN = ${value.isbn}`);
+
+        RemoveBookResponse response = {};
+        Book[] updatedBooks = [];
+        stream<Book, sql:Error?> bookStream = libraryClient->query(`SELECT * FROM Books`);
+        check from Book books in bookStream
+            do {
+                updatedBooks.push(books);
+                response = {
+                    updatedBooks: updatedBooks
+                };
+            };
 
         return response;
 
     }
     remote function ListAvailableBooks(ListAvailableBooksRequest value) returns ListAvailableBooksResponse|error {
         ListAvailableBooksResponse response = {};
-        // stream<Book, sql:Error?> bookStream = libraryClient->query(`SELECT * FROM Books`);
-        // check from Book books in bookStream
-        //     do {
-        //         response = {
-        //             availableBooks: 
-        //         };
-        //     };
+        Book[] availableBooks = [];
+        stream<Book, sql:Error?> bookStream = libraryClient->query(`SELECT * FROM Books`);
+        check from Book books in bookStream
+            do {
+                availableBooks.push(books);
+                response = {
+                    availableBooks: availableBooks
+                };
+            };
 
         // var data = check libraryClient->execute(`SELECT * FROM Books`);
 
@@ -96,11 +100,10 @@ service "LibraryService" on ep {
         //     availableBooks: []
         // };
 
-        Book data = check libraryClient->queryRow(`SELECT * FROM Books`);
-
-        response = {
-            availableBooks: [data]
-        };
+        // Book data = check libraryClient->queryRow(`SELECT * FROM Books WHERE Status = 'Available'`);
+        // response = {
+        //     availableBooks: [data]
+        // };
 
         return response;
     }
@@ -124,17 +127,21 @@ service "LibraryService" on ep {
                         available: true
                     };
                 }
-                response = {
-                    location: book.location,
-                    available: false
-                };
+                if (book.status != "Available") {
+
+                    response = {
+                        location: book.location,
+                        available: false
+                    };
+                }
+                io:println(book.status);
             };
         return response;
     };
 
     remote function BorrowBook(BorrowBookRequest value) returns BorrowBookResponse|error {
-        _ = check libraryClient->execute(`INSERT INTO Borrowed_Books (UserID, ISBN)
-                                            VALUES (${value.userId}, ${value.isbn})`);
+        _ = check libraryClient->execute(`INSERT INTO Borrowed_Books (UserID, ISBN) VALUES (${value.userId}, ${value.isbn})`);
+        _ = check libraryClient->execute(`UPDATE Books SET Status = 'CheckedOut' WHERE ISBN = ${value.isbn}`);
         BorrowBookResponse response = {
             borrowedBook: value
         };
